@@ -4,8 +4,8 @@ docker run `
 --env-file "$PSScriptRoot\.env" `
 -d `
 --network campus-network `
---name sqlserver-campusclaude `
--p 14330:1433 `
--v campusclaude-sqlserver-data:/var/opt/mssql `
+--name postgres-campusclaude `
+-p 54320:5432 `
+-v campusclaude-postgres-data:/var/lib/postgresql/data `
 --restart always `
-mcr.microsoft.com/mssql/server:2022-latest
+postgres:16-bookworm

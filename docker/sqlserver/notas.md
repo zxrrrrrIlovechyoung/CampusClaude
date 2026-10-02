@@ -1,58 +1,118 @@
-# notas
-## comandos de creacion de carpetas y archivos del proyecto
-
-
-´´´bash
-# CampusCloud
-
-Proyecto académico de la asignatura Bases de Datos en la Nube.
+# SQL Server en Docker
 
 ## Objetivo
 
-Construir progresivamente una Nube Académica Local que permita comprender:
+Levantar SQL Server dentro de un contenedor Docker y conectarlo a la misma red donde viven los demas contenedores del proyecto, por ejemplo PostgreSQL y pgAdmin.
 
-- bases de datos relacionales;
-- bases de datos NoSQL;
-- persistencia;
-- usuarios, roles y privilegios;
-- conexión local y remota;
-- integración mediante API;
-- Docker y Docker Compose como herramientas de soporte.
+## Archivos importantes
 
-## Unidad I
+- `docker-run.ps1`: script que crea la red si no existe y despues ejecuta el contenedor.
+- `.env`: variables reales usadas por Docker. Este archivo no se sube a Git.
+- `.env.example`: ejemplo de variables para compartir la configuracion sin exponer contrasenas.
 
-Primera implementación:
+## Variables de entorno
 
-PC → Docker → SQL Server → Volumen → CampusCloud
+El archivo `.env` debe tener este formato:
 
-Tecnología inicial:
+```env
+ACCEPT_EULA=Y
+MSSQL_SA_PASSWORD=CampusCloude123$
+```
 
-- Docker Desktop
-- SQL Server 2025
-- Cliente SQL
-- Git
-- Visual Studio Code
+`ACCEPT_EULA=Y` acepta la licencia de SQL Server dentro del contenedor.
 
-mkdir CampusCloud 
-cd CampusCloud
+`MSSQL_SA_PASSWORD` define la contrasena del usuario administrador `sa`. SQL Server exige una contrasena fuerte: mayusculas, minusculas, numero y simbolo.
 
-mkdir docs
-mkdir docker
-mkdir docker\sqlserver
-mkdir compose
-mkdir sql
-mkdir evidencias
+## Comando usado
 
-New-Item README.md
-New-Item .gitignore
-New-Item docs\bitacora.md
-New-Item docs\arquitectura.md
-New-Item docker\sqlserver\docker-run.ps1
-New-Item docker\sqlserver\.env.example
-New-Item docker\sqlserver\notas.md
-New-Item compose\docker-compose.yml
-New-Item sql\01-create-database.sql
-New-Item sql\02-create-tables.sql
-New-Item sql\03-insert-data.sql
-New-Item sql\04-queries.sql
-New-Item sql\05-security.sql
+```powershell
+docker network create campus-network 2>$null
+
+docker run `
+--env-file "$PSScriptRoot\.env" `
+-d `
+--network campus-network `
+--name sqlserver-campusclaude `
+-p 14330:1433 `
+-v campusclaude-sqlserver-data:/var/opt/mssql `
+--restart always `
+mcr.microsoft.com/mssql/server:2022-latest
+```
+
+## Que hace cada parte
+
+`docker network create campus-network 2>$null` crea la red compartida entre contenedores. Si ya existe, el error se oculta para que el script pueda continuar.
+
+`docker run` crea y arranca un contenedor nuevo.
+
+`--env-file "$PSScriptRoot\.env"` carga las variables de entorno desde el archivo `.env` ubicado en la misma carpeta del script.
+
+`-d` ejecuta el contenedor en segundo plano.
+
+`--network campus-network` conecta SQL Server a la red del proyecto. Gracias a esto, otros contenedores pueden encontrarlo por su nombre: `sqlserver-campusclaude`.
+
+`--name sqlserver-campusclaude` asigna un nombre fijo al contenedor.
+
+`-p 14330:1433` publica el puerto. El puerto `1433` es el puerto interno de SQL Server dentro del contenedor; el puerto `14330` es el puerto que se usa desde la computadora anfitriona.
+
+`-v campusclaude-sqlserver-data:/var/opt/mssql` crea un volumen persistente. La informacion de SQL Server queda guardada aunque el contenedor se elimine.
+
+`--restart always` hace que el contenedor vuelva a iniciar automaticamente si Docker se reinicia.
+
+`mcr.microsoft.com/mssql/server:2022-latest` es la imagen oficial de SQL Server para Linux.
+
+## Como ejecutarlo
+
+Desde PowerShell:
+
+```powershell
+cd docker\sqlserver
+Copy-Item .env.example .env
+.\docker-run.ps1
+```
+
+## Como conectarse
+
+Desde la computadora:
+
+- Servidor: `localhost,14330`
+- Usuario: `sa`
+- Contrasena: la indicada en `MSSQL_SA_PASSWORD`
+
+Desde otro contenedor en la misma red:
+
+- Servidor: `sqlserver-campusclaude,1433`
+- Usuario: `sa`
+- Contrasena: la indicada en `MSSQL_SA_PASSWORD`
+
+## Comandos utiles
+
+Ver contenedores activos:
+
+```powershell
+docker ps
+```
+
+Ver logs de SQL Server:
+
+```powershell
+docker logs sqlserver-campusclaude
+```
+
+Detener el contenedor:
+
+```powershell
+docker stop sqlserver-campusclaude
+```
+
+Eliminar el contenedor sin borrar datos:
+
+```powershell
+docker rm sqlserver-campusclaude
+```
+
+Eliminar el volumen de datos:
+
+```powershell
+docker volume rm campusclaude-sqlserver-data
+```

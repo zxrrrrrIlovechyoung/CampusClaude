@@ -1,0 +1,12 @@
+services:
+ #nase de datos postgres
+
+ postgres-claude:
+  image:postgres:16-bookworm
+  restart: always
+  enviaroment:
+    POST_USER: $("POSTGRES_USER")
+    POSTGRES_PASSWROD: $(POSTGRES_PASSWORD)
+    POSTGRES_DB: $(POSTGRES_DB)
+  ports:
+   - "$(POSTGRES_PORT)"
