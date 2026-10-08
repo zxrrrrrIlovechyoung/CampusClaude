@@ -1,10 +1,10 @@
 services:
   #===============================================================
-  #==========================PostgresSQL
+  #==========================Postgres
   #===============================================================
-  postgres-claude:
+  postgres-cloud:
     image: postgres:16-bookworm
-    container_name: campusclaude-postgres
+    container_name: campuscloud-postgres
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -15,35 +15,26 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - campusclaude_net
-    healthcheck:
-      test: [
-        "CMD-SHELL",
-        "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
-      ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+      - campuscloud_net
 
   #===============================================================
   #==========================Pgadmin
   #===============================================================
   pgadmin:
     image: dpage/pgadmin4:6.17
-    container_name: campusclaude-pgadmin
+    container_name: campuscloud-pgadmin
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT _PASSWORD}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     ports:
       - "${PGADMIN_PORT}:80"
     depends_on:
-      - postgres-claude
+      - postgres-cloud
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
-      - campusclaude_net
+      - campuscloud_net
 
 #===============================================================
 #==========================volumenes
@@ -61,6 +52,6 @@ volumes:
 #==========================RED
 #===============================================================
 networks:
-  campusclaude_net:
+  campuscloud_net:
     external: true
     name: ${DOCKER_NETWORK}
