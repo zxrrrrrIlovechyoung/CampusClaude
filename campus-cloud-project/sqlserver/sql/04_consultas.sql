@@ -1,6 +1,3 @@
--- 04_consultas.sql
--- Consultas relacionadas y operaciones CRUD demostrables.
-
 USE CampusCloud;
 GO
 
