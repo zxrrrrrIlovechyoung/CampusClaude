@@ -70,9 +70,3 @@ GRANT campuscloud_admin TO cc_admin;
 GRANT campuscloud_operador TO cc_operador;
 GRANT campuscloud_consulta TO cc_consulta;
 GRANT campuscloud_remoto_limitado TO marianofool;
-
--- Prueba autorizada: este usuario puede consultar.
--- psql -h localhost -p 5432 -U cc_consulta -d CampusCloud -c "SELECT * FROM estudiantes;"
-
--- Prueba denegada: este usuario NO debe poder insertar.
--- psql -h localhost -p 5432 -U cc_consulta -d CampusCloud -c "INSERT INTO servicios (nombre_servicio, descripcion) VALUES ('No permitido', 'Debe fallar');"
