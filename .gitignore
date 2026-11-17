@@ -1,4 +1,11 @@
 .env
+**/.env
+!.env.example
 node_modules/
 *.log
+*.tmp
+*.zip
 notasgenerales.md
+**/data/
+**/_no_entregar/
+tmp/

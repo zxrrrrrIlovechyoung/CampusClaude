@@ -1,23 +1,26 @@
 -- 05_usuarios_roles.sql
 -- Logins, usuarios, roles y privilegios diferenciados en SQL Server.
+-- Ejecutar con sqlcmd y variables seguras, por ejemplo:
+-- sqlcmd -v CC_ADMIN_PASSWORD="<local>" CC_OPERADOR_PASSWORD="<local>" CC_CONSULTA_PASSWORD="<local>" CC_REMOTO_PASSWORD="<local>"
+-- Nunca escribas contraseñas reales en este archivo ni las publiques en Git.
 
 USE master;
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.sql_logins WHERE name = N'cc_admin')
-    CREATE LOGIN cc_admin WITH PASSWORD = 'AdminCampusCloud2026#', CHECK_POLICY = OFF;
+    CREATE LOGIN cc_admin WITH PASSWORD = '$(CC_ADMIN_PASSWORD)', CHECK_POLICY = OFF;
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.sql_logins WHERE name = N'cc_operador')
-    CREATE LOGIN cc_operador WITH PASSWORD = 'OperadorCampusCloud2026#', CHECK_POLICY = OFF;
+    CREATE LOGIN cc_operador WITH PASSWORD = '$(CC_OPERADOR_PASSWORD)', CHECK_POLICY = OFF;
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.sql_logins WHERE name = N'cc_consulta')
-    CREATE LOGIN cc_consulta WITH PASSWORD = 'ConsultaCampusCloud2026#', CHECK_POLICY = OFF;
+    CREATE LOGIN cc_consulta WITH PASSWORD = '$(CC_CONSULTA_PASSWORD)', CHECK_POLICY = OFF;
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.sql_logins WHERE name = N'marianofool')
-    CREATE LOGIN marianofool WITH PASSWORD = 'CompaneroCampusCloud2026#', CHECK_POLICY = OFF;
+    CREATE LOGIN marianofool WITH PASSWORD = '$(CC_REMOTO_PASSWORD)', CHECK_POLICY = OFF;
 GO
 
 USE CampusCloud;

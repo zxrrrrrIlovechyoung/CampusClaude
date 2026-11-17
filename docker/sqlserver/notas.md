@@ -16,7 +16,7 @@ El archivo `.env` debe tener este formato:
 
 ```env
 ACCEPT_EULA=Y
-MSSQL_SA_PASSWORD=CampusCloude123$
+MSSQL_SA_PASSWORD=<contraseña-local-segura>
 ```
 
 `ACCEPT_EULA=Y` acepta la licencia de SQL Server dentro del contenedor.

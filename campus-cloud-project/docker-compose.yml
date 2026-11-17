@@ -111,6 +111,31 @@ services:
       retries: 5
       start_period: 20s
 
+  #===============================================================
+  #==========================Cassandra
+  #===============================================================
+  cassandra-cloud:
+    image: cassandra:5.0
+    container_name: campuscloud-cassandra
+    restart: always
+    environment:
+      CASSANDRA_CLUSTER_NAME: CampusCloudCluster
+      CASSANDRA_DC: datacenter1
+      CASSANDRA_RACK: rack1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+    ports:
+      - "${CASSANDRA_PORT:-9042}:9042"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks:
+      - campuscloud_net
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh 127.0.0.1 9042 -e 'SELECT cluster_name FROM system.local' >/dev/null 2>&1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
 
 #===============================================================
 #==========================volumenes
@@ -135,6 +160,10 @@ volumes:
   mongo_data:
     external: true
     name: ${MONGO_VOLUME}
+
+  cassandra_data:
+    external: true
+    name: ${CASSANDRA_VOLUME:-campuscloud-cassandra-data}
 
 #===============================================================
 #==========================RED
